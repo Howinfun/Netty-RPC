@@ -1,9 +1,9 @@
-package com.hyf.rpc.netty;
+package com.hyf.rpc.netty.server;
 
 import com.hyf.rpc.netty.config.NettyConfig;
 import com.hyf.rpc.netty.handler.PacketCodecHandler;
-import com.hyf.rpc.netty.handler.RPCRequestPacketHandler;
 import com.hyf.rpc.netty.handler.Spliter;
+import com.hyf.rpc.netty.server.handler.RPCRequestPacketHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

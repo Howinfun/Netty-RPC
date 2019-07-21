@@ -1,4 +1,5 @@
-package com.hyf.rpc.netty.config;
+package com.hyf.rpc.netty.client.config;
+
 import com.hyf.rpc.netty.anno.EnableNettyRPC;
 import com.hyf.rpc.netty.anno.NettyRPC;
 import org.springframework.beans.factory.BeanClassLoaderAware;
@@ -109,15 +110,16 @@ public class NettyRpcClientRegistrar implements ImportBeanDefinitionRegistrar, B
                 .getAnnotationAttributes(EnableNettyRPC.class.getCanonicalName());
 
         Set<String> basePackages = new HashSet<>();
-        for (String pkg : (String[]) attributes.get("basePackages")) {
-            if (StringUtils.hasText(pkg)) {
-                basePackages.add(pkg);
-            }
-        }
         // 如果指定的包路径为空，则
         if (basePackages.isEmpty()) {
             basePackages.add(
                     ClassUtils.getPackageName(importingClassMetadata.getClassName()));
+        }else{
+            for (String pkg : (String[]) attributes.get("basePackages")) {
+                if (StringUtils.hasText(pkg)) {
+                    basePackages.add(pkg);
+                }
+            }
         }
         return basePackages;
     }

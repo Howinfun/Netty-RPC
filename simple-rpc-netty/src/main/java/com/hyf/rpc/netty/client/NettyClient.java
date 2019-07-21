@@ -1,8 +1,8 @@
-package com.hyf.rpc.netty;
+package com.hyf.rpc.netty.client;
 
+import com.hyf.rpc.netty.client.handler.RPCResponsePacketHandler;
 import com.hyf.rpc.netty.config.NettyConfig;
 import com.hyf.rpc.netty.handler.PacketCodecHandler;
-import com.hyf.rpc.netty.handler.RPCResponsePacketHandler;
 import com.hyf.rpc.netty.handler.Spliter;
 import com.hyf.rpc.netty.packet.Packet;
 import io.netty.bootstrap.Bootstrap;

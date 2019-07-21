@@ -1,6 +1,6 @@
-package com.hyf.rpc.netty.config;
+package com.hyf.rpc.netty.client.config;
 
-import com.hyf.rpc.netty.NettyClient;
+import com.hyf.rpc.netty.client.NettyClient;
 import com.hyf.rpc.netty.packet.RPCRequestPacket;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;

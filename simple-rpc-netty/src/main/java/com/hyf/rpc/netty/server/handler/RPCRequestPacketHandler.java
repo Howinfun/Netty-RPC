@@ -1,4 +1,4 @@
-package com.hyf.rpc.netty.handler;
+package com.hyf.rpc.netty.server.handler;
 
 import com.hyf.rpc.netty.packet.RPCRequestPacket;
 import com.hyf.rpc.netty.packet.RPCResponsePacket;

@@ -1,4 +1,4 @@
-package com.hyf.rpc.netty.config;
+package com.hyf.rpc.netty.client.config;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

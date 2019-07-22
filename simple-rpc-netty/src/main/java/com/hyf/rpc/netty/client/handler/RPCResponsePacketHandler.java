@@ -18,7 +18,5 @@ public class RPCResponsePacketHandler extends SimpleChannelInboundHandler<RPCRes
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RPCResponsePacket rpcResponsePacket) throws Exception {
         this.result = rpcResponsePacket.getResult();
-        // 接受到结果后记得关闭通道，不然InvocationHandler不能获取到结果
-        ctx.channel().close();
     }
 }

@@ -44,6 +44,7 @@ public class RPCRequestPacketHandler extends SimpleChannelInboundHandler<RPCRequ
             Object result = method.invoke(subClass.newInstance(),params);
             responsePacket.setSuccess(true);
             responsePacket.setResult(result);
+            System.out.println("调用结果："+result);
         }
         ctx.channel().writeAndFlush(responsePacket);
     }

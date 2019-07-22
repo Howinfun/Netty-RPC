@@ -32,8 +32,8 @@ public class HelloController {
     private HelloService helloService;
 
     @GetMapping("/sayHello")
-    public String sayHello(){
-        return  helloService.sayHello("666");
+    public String sayHello(@RequestParam String name){
+        return  helloService.sayHello(name);
     }
 
     @PostMapping("/postParams")

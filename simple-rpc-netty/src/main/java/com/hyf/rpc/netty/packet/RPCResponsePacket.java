@@ -13,7 +13,6 @@ public class RPCResponsePacket extends Packet{
 
     private boolean success;
     private Object result;
-    private String msg;
 
     @Override
     public Byte getCommand() {

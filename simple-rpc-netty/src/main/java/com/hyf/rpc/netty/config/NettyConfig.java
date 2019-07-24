@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("netty")
 @Data
 public class NettyConfig {
-    private String ip;
-    private Integer port;
+    private String clientIp;
+    private Integer clientPort;
+    private Integer serverPort;
 }

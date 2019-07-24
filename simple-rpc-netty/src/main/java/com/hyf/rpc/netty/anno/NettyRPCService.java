@@ -6,11 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @desc 使用RPC接口
+ * @desc 提供给RPC调用的实现
  * @author Howinfun
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface NettyRPC {
+public @interface NettyRPCService {
+    Class<?> value();
     String version() default "1";
 }

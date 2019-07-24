@@ -68,7 +68,7 @@ public class NettyClient {
                             }
                         });
                 // 同步等待连接成功
-                ChannelFuture future = bootstrap.connect(config.getIp(),config.getPort()).sync();
+                ChannelFuture future = bootstrap.connect(config.getClientIp(),config.getClientPort()).sync();
                 if (future.isSuccess()){
                     // 同步等待发送成功
                     future.channel().writeAndFlush(packet).sync();

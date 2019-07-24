@@ -2,13 +2,12 @@ package com.hyf.rpc.netty.server.handler;
 
 import com.hyf.rpc.netty.packet.RPCRequestPacket;
 import com.hyf.rpc.netty.packet.RPCResponsePacket;
+import com.hyf.rpc.netty.server.config.NettyServerInitConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.reflections.Reflections;
 
 import java.lang.reflect.Method;
-import java.util.Set;
 
 /**
  * @author Howinfun
@@ -24,27 +23,30 @@ public class RPCRequestPacketHandler extends SimpleChannelInboundHandler<RPCRequ
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RPCRequestPacket msg) throws Exception {
         RPCResponsePacket responsePacket = new RPCResponsePacket();
-        // 获取rpc调用信息，利用反射执行方法，返回结果
+        // 根据请求信息调用方法
         Class clazz = msg.getClazz();
+        String version = msg.getVersion();
         String methodName = msg.getMethodName();
         Object[] params = msg.getParams();
         Class[] paramTypes = msg.getParamTypes();
-        // 扫面路径下所有元数据
-        Reflections reflections = new Reflections("com.hyf.rpc.serviceImpl");
-        Set<Class> subTypes = reflections.getSubTypesOf(clazz);
-        if (subTypes.isEmpty()){
+        System.out.println(NettyServerInitConfig.beanMap.toString());
+        if (NettyServerInitConfig.beanMap.isEmpty()){
             responsePacket.setSuccess(false);
-            responsePacket.setMsg("没有实现类");
-        }else if (subTypes.size() > 1){
-            responsePacket.setSuccess(false);
-            responsePacket.setMsg("多个实现类，无法判断执行哪一个");
-        }else{
-            Class subClass = subTypes.toArray(new Class[1])[0];
-            Method method = subClass.getMethod(methodName,paramTypes);
-            Object result = method.invoke(subClass.newInstance(),params);
-            responsePacket.setSuccess(true);
-            responsePacket.setResult(result);
-            System.out.println("调用结果："+result);
+            responsePacket.setResult("无服务提供");
+        }else {
+            String key = clazz.getName()+version;
+            if (NettyServerInitConfig.beanMap.containsKey(key)){
+                Object serviceBean = NettyServerInitConfig.beanMap.get(key);
+                Class serviceClazz = serviceBean.getClass();
+                Method method = serviceClazz.getMethod(methodName,paramTypes);
+                Object result = method.invoke(serviceClazz.newInstance(),params);
+                responsePacket.setSuccess(true);
+                responsePacket.setResult(result);
+                System.out.println("调用结果："+result);
+            }else {
+                responsePacket.setSuccess(false);
+                responsePacket.setResult("无服务提供");
+            }
         }
         ctx.channel().writeAndFlush(responsePacket);
     }

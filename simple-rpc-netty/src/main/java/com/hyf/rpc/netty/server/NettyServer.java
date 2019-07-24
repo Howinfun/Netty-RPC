@@ -50,9 +50,13 @@ public class NettyServer {
     }
 
     public void start(){
-        ChannelFuture future = bootstrap.bind(nettyConfig.getPort());
-        if (future.isSuccess()){
-            System.out.println("netty服务启动成功，端口号为："+nettyConfig.getPort());
+        try {
+            ChannelFuture future = bootstrap.bind(nettyConfig.getServerPort()).sync();
+            if (future.isSuccess()){
+                System.out.println("netty服务启动成功，端口号为："+nettyConfig.getServerPort());
+            }
+        } catch (InterruptedException e) {
+            System.err.println("netty服务启动失败");
         }
     }
 

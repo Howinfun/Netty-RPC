@@ -15,6 +15,8 @@ public class RPCRequestPacket extends Packet{
     private String methodName;
     /** 调用服务的实现类class */
     private Class<?> clazz;
+    /** 版本号 */
+    private String version;
     /**
      * 调用方法的参数列表类型
      */

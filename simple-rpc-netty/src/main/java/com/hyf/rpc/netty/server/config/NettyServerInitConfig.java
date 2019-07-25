@@ -1,7 +1,7 @@
 package com.hyf.rpc.netty.server.config;
 
 import com.hyf.rpc.netty.anno.NettyRPCService;
-import com.hyf.rpc.netty.config.NettyConfig;
+import com.hyf.rpc.netty.properties.NettyProperties;
 import com.hyf.rpc.netty.server.NettyServer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +28,14 @@ public class NettyServerInitConfig implements ApplicationListener<ContextRefresh
     @Autowired
     private NettyServer nettyServer;
     @Autowired
-    private NettyConfig nettyConfig;
+    private NettyProperties nettyProperties;
     /**
      * 当ApplicationContext初始或刷新完毕触发
      * @param event
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (nettyConfig.getServerPort() != null){
+        if (nettyProperties.getServerPort() != null){
             nettyServer.start();
         }
     }

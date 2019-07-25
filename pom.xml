@@ -7,10 +7,6 @@
         <module>simple-rpc-client</module>
         <module>simple-rpc-encapsulation</module>
         <module>simple-rpc-netty</module>
-        <!--<module>register-rpc-server</module>
-        <module>register-rpc-client</module>
-        <module>register-rpc-netty</module>
-        <module>register-rpc-encapsulation</module>-->
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

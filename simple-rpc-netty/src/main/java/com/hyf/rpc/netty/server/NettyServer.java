@@ -1,8 +1,8 @@
 package com.hyf.rpc.netty.server;
 
-import com.hyf.rpc.netty.config.NettyConfig;
 import com.hyf.rpc.netty.handler.PacketCodecHandler;
 import com.hyf.rpc.netty.handler.Spliter;
+import com.hyf.rpc.netty.properties.NettyProperties;
 import com.hyf.rpc.netty.server.handler.RPCRequestPacketHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -24,7 +24,7 @@ import javax.annotation.PreDestroy;
 @Component
 public class NettyServer {
     @Autowired
-    private NettyConfig nettyConfig;
+    private NettyProperties nettyProperties;
 
     private ServerBootstrap bootstrap;
     private NioEventLoopGroup bossGroup;
@@ -51,9 +51,9 @@ public class NettyServer {
 
     public void start(){
         try {
-            ChannelFuture future = bootstrap.bind(nettyConfig.getServerPort()).sync();
+            ChannelFuture future = bootstrap.bind(nettyProperties.getServerPort()).sync();
             if (future.isSuccess()){
-                System.out.println("netty服务启动成功，端口号为："+nettyConfig.getServerPort());
+                System.out.println("netty服务启动成功，端口号为："+nettyProperties.getServerPort());
             }
         } catch (InterruptedException e) {
             System.err.println("netty服务启动失败");

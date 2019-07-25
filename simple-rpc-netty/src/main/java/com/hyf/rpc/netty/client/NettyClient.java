@@ -2,10 +2,10 @@ package com.hyf.rpc.netty.client;
 
 import com.hyf.rpc.netty.client.handler.RPCResponsePacketHandler;
 import com.hyf.rpc.netty.common.ChannelPool;
-import com.hyf.rpc.netty.config.NettyConfig;
 import com.hyf.rpc.netty.handler.PacketCodecHandler;
 import com.hyf.rpc.netty.handler.Spliter;
 import com.hyf.rpc.netty.packet.Packet;
+import com.hyf.rpc.netty.properties.NettyProperties;
 import com.hyf.rpc.netty.utils.IpUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -28,11 +28,11 @@ import javax.annotation.PostConstruct;
 public class NettyClient {
 
     @Autowired
-    private NettyConfig nettyConfig;
-    private static NettyConfig config;
+    private NettyProperties nettyProperties;
+    private static NettyProperties properties;
     @PostConstruct
     public void init(){
-        config = this.nettyConfig;
+        properties = this.nettyProperties;
     }
 
     public static Object callRPC(Packet packet) throws Exception{
@@ -68,7 +68,7 @@ public class NettyClient {
                             }
                         });
                 // 同步等待连接成功
-                ChannelFuture future = bootstrap.connect(config.getClientIp(),config.getClientPort()).sync();
+                ChannelFuture future = bootstrap.connect(properties.getClientIp(),properties.getClientPort()).sync();
                 if (future.isSuccess()){
                     // 同步等待发送成功
                     future.channel().writeAndFlush(packet).sync();

@@ -38,6 +38,18 @@ public class ZookeeperListener implements Runnable {
         this.zookeeperProperties = zookeeperProperties;
     }
 
+    private void addService(String servicePath,IPPojo ip){
+        // 判断缓存的是否有serverPath服务
+        if (ZookeeperListener.serviceList.containsKey(servicePath)){
+            Set<IPPojo> ips = ZookeeperListener.serviceList.get(servicePath);
+            ips.add(ip);
+        }else{
+            Set<IPPojo> ips = new HashSet<>(10);
+            ips.add(ip);
+            ZookeeperListener.serviceList.put(servicePath,ips);
+        }
+    }
+
     @Override
     public void run() {
         try {
@@ -80,14 +92,16 @@ public class ZookeeperListener implements Runnable {
                             for (String s : childPath) {
                                 // 查询数据
                                 IPPojo ip = JSON.parseObject(new String(zkUtils.getData(serverPath+"/"+s)),IPPojo.class);
-
+                                addService(serverPath,ip);
                             }
                             break;
                         case CHILD_UPDATED:
                             System.out.println("子节点："+event.getData().getPath()+",数据修改为："+new String(event.getData().getData()));
                             break;
                         case CHILD_REMOVED:
-
+                            String serverPath2 = event.getData().getPath();
+                            // 获取此应用下面的服务列表
+                            List<String> childPath2 = zkUtils.getChildsByPath(serverPath2);
                             break;
                         default:
                             break;
@@ -114,14 +128,7 @@ public class ZookeeperListener implements Runnable {
                         byte[] childData = event.getData().getData();
                         IPPojo ipPojo = JSON.parseObject(new String(childData),IPPojo.class);
                         System.out.println("新增子节点："+event.getData().getPath()+",数据为："+ipPojo);
-                        if (ZookeeperListener.serviceList.containsKey(childPath)){
-                            Set<IPPojo> ips = ZookeeperListener.serviceList.get(childPath);
-                            ips.add(ipPojo);
-                        }else{
-                            Set<IPPojo> ips = new HashSet<>(10);
-                            ips.add(ipPojo);
-                            ZookeeperListener.serviceList.put(childPath,ips);
-                        }
+                        addService(childPath,ipPojo);
                         break;
                     case CHILD_UPDATED:
                         System.out.println("子节点："+event.getData().getPath()+",数据修改为："+new String(event.getData().getData()));

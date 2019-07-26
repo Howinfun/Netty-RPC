@@ -14,11 +14,11 @@ import org.springframework.stereotype.Component;
 @Data
 public class ZookeeperProperties {
     /** 连接地址 */
-    private String url;
+    private String url="127.0.0.1:2181";
     /** session超时，单位毫秒 */
-    private Integer sessionTimeOut;
+    private Integer sessionTimeOut=30000;
     /** 命名空间，避免多个应用节点名称的冲突 */
-    private String namespace;
+    private String namespace="test";
     /** 所有项目提供服务节点的根节点 */
     public static final String root = "root";
 }

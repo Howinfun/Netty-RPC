@@ -71,5 +71,13 @@ public class ZookeeperServicesInitConfig implements ApplicationContextAware {
         }
         System.out.println(ZookeeperListener.serviceList.toString());
         zkUtils.close();
+
+        // 开启监听线程
+        Thread thread = new Thread(new ZookeeperListener(this.zookeeperProperties),"ZookeeperListener-Thread");
+        // 守护线程，会在后台一直运行着
+        thread.setDaemon(true);
+        thread.start();
     }
+
+
 }

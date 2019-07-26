@@ -2,6 +2,7 @@ package com.hyf.rpc.netty.common;
 
 import io.netty.channel.Channel;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ChannelPool {
 
+    /** 将channel缓存起来，key为IP:port  value为channel*/
     private static final Map<String, Channel> channels = new ConcurrentHashMap<>(10);
 
     public static Channel getChannel(String clientId){
@@ -29,5 +31,14 @@ public class ChannelPool {
     }
     public static boolean containChannel(String clientId){
         return channels.containsKey(clientId);
+    }
+
+    public static String getContainKey(List<String> ips){
+        for (String ip : ips) {
+            if (channels.containsKey(ip)){
+                return ip;
+            }
+        }
+        return null;
     }
 }

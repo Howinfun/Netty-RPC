@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 public class NettyProperties {
-    private String clientIp;
-    private Integer clientPort;
-    private Integer serverPort;
+    private String clientIp="127.0.0.1";
+    private Integer clientPort=1000;
+    private Integer serverPort=1001;
 }

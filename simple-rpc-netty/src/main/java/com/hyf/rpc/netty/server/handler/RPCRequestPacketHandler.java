@@ -50,4 +50,9 @@ public class RPCRequestPacketHandler extends SimpleChannelInboundHandler<RPCRequ
         }
         ctx.channel().writeAndFlush(responsePacket);
     }
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        // 如果出现异常，则关闭体通道
+        ctx.channel().close();
+    }
 }

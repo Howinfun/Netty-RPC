@@ -33,6 +33,18 @@ public class ZookeeperCache{
     }
 
     /**
+     * 移除IP
+     * @param ip
+     */
+    public static void removeIPPojo(String ip){
+        String[] ipArr = ip.split(":");
+        IPPojo ipPojo = IPPojo.builder().ip(ipArr[0]).port(Integer.parseInt(ipArr[1])).build();
+        serviceList.forEach((key,value)->{
+            value.remove(ipPojo);
+        });
+    }
+
+    /**
      * 增加服务
      * @param servicePath
      * @param ip

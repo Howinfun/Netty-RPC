@@ -8,7 +8,7 @@ import com.hyf.rpc.netty.handler.Spliter;
 import com.hyf.rpc.netty.packet.RPCRequestPacket;
 import com.hyf.rpc.netty.properties.NettyProperties;
 import com.hyf.rpc.netty.utils.IpUtil;
-import com.hyf.rpc.zookeeper.config.ZookeeperListener;
+import com.hyf.rpc.zookeeper.config.ZookeeperCache;
 import com.hyf.rpc.zookeeper.pojo.IPPojo;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -46,7 +46,7 @@ public class NettyClient {
         // 根据Packet的服务看有哪些应用提供服务，优先调用有缓存channel的，否则就创建channel并缓存起来
         String interfaceName = packet.getClazz().getName();
         String version = packet.getVersion();
-        Set<IPPojo> ips = ZookeeperListener.serviceList.get(interfaceName+version);
+        Set<IPPojo> ips = ZookeeperCache.getServiceList().get(interfaceName+version);
         if (ips.size() <=0 ){
             return "无服务提供";
         }

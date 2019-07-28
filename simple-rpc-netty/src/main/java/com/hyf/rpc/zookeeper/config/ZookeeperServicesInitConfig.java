@@ -11,7 +11,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextClosedEvent;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,12 +26,13 @@ import java.util.Set;
  * @date 2019/7/25
  */
 @Configuration
-public class ZookeeperServicesInitConfig implements ApplicationContextAware {
+public class ZookeeperServicesInitConfig implements ApplicationContextAware, ApplicationListener<ContextClosedEvent> {
 
     @Autowired
     private NettyProperties nettyProperties;
     @Autowired
     private ZookeeperProperties zookeeperProperties;
+    private Thread thread;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -60,24 +63,33 @@ public class ZookeeperServicesInitConfig implements ApplicationContextAware {
                 // 获取服务下面的服务列表
                 List<String> services = zkUtils.getChildsByPath(root.toString()+"/"+server);
                 for (String service : services) {
-                    if (!ZookeeperListener.serviceList.containsKey(service)){
-                        ZookeeperListener.serviceList.put(service,new HashSet<>(10));
+                    if (!ZookeeperCache.getServiceList().containsKey(service)){
+                        ZookeeperCache.getServiceList().put(service,new HashSet<>(10));
                     }
-                    Set<IPPojo> ips = ZookeeperListener.serviceList.get(service);
+                    Set<IPPojo> ips = ZookeeperCache.getServiceList().get(service);
                     IPPojo ipPojo = JSON.parseObject(new String(zkUtils.getData(root.toString()+"/"+server+"/"+service)),IPPojo.class);
                     ips.add(ipPojo);
                 }
             }
         }
-        System.out.println(ZookeeperListener.serviceList.toString());
         zkUtils.close();
 
         // 开启监听线程
-        Thread thread = new Thread(new ZookeeperListener(this.zookeeperProperties),"ZookeeperListener-Thread");
+        thread = new Thread(new ZookeeperListener(this.zookeeperProperties),"ZookeeperListener-Thread");
         // 守护线程，会在后台一直运行着
         thread.setDaemon(true);
         thread.start();
     }
 
-
+    @Override
+    public void onApplicationEvent(ContextClosedEvent contextClosedEvent) {
+        System.err.println("程序停止");
+        // 去除掉该应用提供的服务
+        StringBuilder serverPath = new StringBuilder();
+        serverPath.append("/").append(ZookeeperProperties.root)
+                .append("/").append(zookeeperProperties.getNamespace());
+        ZKUtils zkUtils = new ZKUtils(this.zookeeperProperties);
+        zkUtils.start();
+        zkUtils.delNodeByRecursion(serverPath.toString());
+    }
 }

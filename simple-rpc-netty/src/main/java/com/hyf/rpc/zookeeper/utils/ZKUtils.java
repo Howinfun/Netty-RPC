@@ -169,8 +169,6 @@ public class ZKUtils {
         try {
             if (checkExisit(path)){
                 zkClient.delete().guaranteed().deletingChildrenIfNeeded().forPath(path);
-            }else{
-                return false;
             }
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -186,7 +184,9 @@ public class ZKUtils {
      */
     public boolean delNode(String path){
         try {
-            zkClient.delete().guaranteed().forPath(path);
+            if (checkExisit(path)){
+                zkClient.delete().guaranteed().forPath(path);
+            }
         } catch (Exception e) {
             System.err.println(e.getMessage());
             return false;
@@ -220,7 +220,9 @@ public class ZKUtils {
     public List<String> getChildsByPath(String path){
         List list = new ArrayList(10);
         try {
-            list = zkClient.getChildren().forPath(path);
+            if (checkExisit(path)){
+                list = zkClient.getChildren().forPath(path);
+            }
         } catch (Exception e) {
             System.err.println(e.getMessage());
             return list;

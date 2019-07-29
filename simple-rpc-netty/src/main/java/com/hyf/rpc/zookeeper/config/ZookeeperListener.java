@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.hyf.rpc.zookeeper.pojo.IPPojo;
 import com.hyf.rpc.zookeeper.properties.ZookeeperProperties;
 import com.hyf.rpc.zookeeper.utils.ZKUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -20,6 +21,7 @@ import java.util.List;
  * @desc
  * @date 2019/7/25
  */
+@Slf4j
 public class ZookeeperListener implements Runnable{
 
     private ZookeeperProperties zookeeperProperties;
@@ -53,7 +55,7 @@ public class ZookeeperListener implements Runnable{
             addRootListener(root.toString(),this.zkClient,this.zkUtils);
         }catch (Exception e){
             e.printStackTrace();
-            System.err.println("zookeeper监听失败:"+e.getMessage());
+            log.error("zookeeper监听失败:"+e.getMessage());
         }
     }
 
@@ -67,7 +69,7 @@ public class ZookeeperListener implements Runnable{
                 switch(event.getType()){
                     case CHILD_ADDED:
                         String serverPath = event.getData().getPath();
-                        System.out.println("/root->新增子节点："+serverPath+"");
+                        log.info("/root->新增子节点："+serverPath);
                         // 获取此应用下面的服务列表
                         List<String> childPath = zkUtils.getChildsByPath(serverPath);
                         for (String s : childPath) {
@@ -79,11 +81,11 @@ public class ZookeeperListener implements Runnable{
                         addServerListener(serverPath,client);
                         break;
                     case CHILD_UPDATED:
-                        System.out.println("/root->子节点："+event.getData().getPath()+",数据修改为："+new String(event.getData().getData()));
+                        log.info("/root->子节点："+event.getData().getPath()+",数据修改为："+new String(event.getData().getData()));
                         break;
                     case CHILD_REMOVED:
                         String serverPath2 = event.getData().getPath();
-                        System.out.println("子节点："+serverPath2+"被删除");
+                        log.info("子节点："+serverPath2+"被删除");
                         // 获取此应用下面的服务列表 不能这么玩，节点都没了，肯定是查的是空，所以最好是如果有子节点，节点不能删除
                         /*List<String> childPath2 = zkUtils.getChildsByPath(serverPath2);
                         for (String s : childPath2) {
@@ -116,18 +118,18 @@ public class ZookeeperListener implements Runnable{
                         String childPath = childPathArr[childPathArr.length-1];
                         byte[] childData = event.getData().getData();
                         IPPojo ipPojo = JSON.parseObject(new String(childData),IPPojo.class);
-                        System.out.println("新增子节点："+event.getData().getPath()+",数据为："+ipPojo);
+                        log.info("新增子节点："+event.getData().getPath()+",数据为："+ipPojo);
                         ZookeeperCache.addService(childPath,ipPojo);
                         break;
                     case CHILD_UPDATED:
-                        System.out.println("子节点："+event.getData().getPath()+",数据修改为："+new String(event.getData().getData()));
+                        log.info("子节点："+event.getData().getPath()+",数据修改为："+new String(event.getData().getData()));
                         break;
                     case CHILD_REMOVED:
                         String[] childPathArr2 = event.getData().getPath().split("/");
                         String childPath2 = childPathArr2[childPathArr2.length-1];
                         byte[] childData2 = event.getData().getData();
                         IPPojo ipPojo2 = JSON.parseObject(new String(childData2),IPPojo.class);
-                        System.out.println("子节点："+event.getData().getPath()+"被删除");
+                        log.info("子节点："+event.getData().getPath()+"被删除");
                         ZookeeperCache.delService(childPath2,ipPojo2);
                         break;
                     default:

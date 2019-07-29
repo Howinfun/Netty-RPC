@@ -33,7 +33,12 @@ public class HelloController {
 
     @GetMapping("/sayHello")
     public String sayHello(@RequestParam String name){
-        return  helloService.sayHello(name);
+        try {
+            return  helloService.sayHello(name);
+        }catch (Exception e){
+            return e.getMessage();
+        }
+
     }
 
     @PostMapping("/postParams")

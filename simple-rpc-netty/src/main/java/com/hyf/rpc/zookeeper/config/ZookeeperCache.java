@@ -1,6 +1,7 @@
 package com.hyf.rpc.zookeeper.config;
 
 import com.hyf.rpc.zookeeper.pojo.IPPojo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2019/7/27
  * @company WCWC
  */
+@Slf4j
 public class ZookeeperCache{
 
     /** 存储提供服务列表 key->服务名 value->提供服务的ip:port,用set保存，能帮我们去重，不过IPPojo记得重写equals和hasCode */
@@ -59,7 +61,7 @@ public class ZookeeperCache{
             ips.add(ip);
             serviceList.put(servicePath,ips);
         }
-        System.out.println("服务列表：数量->"+serviceList.size()+" 列表->"+serviceList.toString());
+        log.info("服务列表：数量->"+serviceList.size()+" 列表->"+serviceList.toString());
     }
 
     /**
@@ -74,7 +76,7 @@ public class ZookeeperCache{
                 ips.remove(ip);
             }
         }
-        System.out.println("服务列表：数量->"+serviceList.size()+" 列表->"+serviceList.toString());
+        log.info("服务列表：数量->"+serviceList.size()+" 列表->"+serviceList.toString());
     }
 
     /**
@@ -86,7 +88,7 @@ public class ZookeeperCache{
         if (!listenerList.containsKey(serverPath)){
             listenerList.put(serverPath,cache);
         }
-        System.out.println("监听列表：数量->"+listenerList.size()+" 列表->"+listenerList.toString());
+        log.info("监听列表：数量->"+listenerList.size()+" 列表->"+listenerList.toString());
     }
 
     /**
@@ -99,7 +101,7 @@ public class ZookeeperCache{
             try {
                 cache.close();
                 listenerList.remove(serverPath);
-                System.out.println("监听列表：数量->"+listenerList.size()+" 列表->"+listenerList.toString());
+                log.info("监听列表：数量->"+listenerList.size()+" 列表->"+listenerList.toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }

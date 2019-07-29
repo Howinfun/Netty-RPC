@@ -7,6 +7,7 @@ import com.hyf.rpc.netty.utils.IpUtil;
 import com.hyf.rpc.zookeeper.pojo.IPPojo;
 import com.hyf.rpc.zookeeper.properties.ZookeeperProperties;
 import com.hyf.rpc.zookeeper.utils.ZKUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -26,6 +27,7 @@ import java.util.Set;
  * @date 2019/7/25
  */
 @Configuration
+@Slf4j
 public class ZookeeperServicesInitConfig implements ApplicationContextAware, ApplicationListener<ContextClosedEvent> {
 
     @Autowired
@@ -83,7 +85,7 @@ public class ZookeeperServicesInitConfig implements ApplicationContextAware, App
 
     @Override
     public void onApplicationEvent(ContextClosedEvent contextClosedEvent) {
-        System.err.println("程序停止");
+        log.error("程序停止");
         // 去除掉该应用提供的服务
         StringBuilder serverPath = new StringBuilder();
         serverPath.append("/").append(ZookeeperProperties.root)

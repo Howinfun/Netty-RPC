@@ -3,6 +3,7 @@ package com.hyf.rpc.netty.client;
 import com.hyf.rpc.netty.attributes.Attributes;
 import com.hyf.rpc.netty.client.handler.RPCResponsePacketHandler;
 import com.hyf.rpc.netty.common.ChannelPool;
+import com.hyf.rpc.netty.common.Result;
 import com.hyf.rpc.netty.handler.PacketCodecHandler;
 import com.hyf.rpc.netty.handler.Spliter;
 import com.hyf.rpc.netty.packet.RPCRequestPacket;
@@ -43,14 +44,16 @@ public class NettyClient {
         properties = this.nettyProperties;
     }
 
-    public static Object callRPC(RPCRequestPacket packet) throws Exception{
-        Object result;
+    public static Result callRPC(RPCRequestPacket packet) throws Exception{
+        Result result = new Result();
         // 根据Packet的服务看有哪些应用提供服务，优先调用有缓存channel的，否则就创建channel并缓存起来
         String interfaceName = packet.getClazz().getName();
         String version = packet.getVersion();
         Set<IPPojo> ips = ZookeeperCache.getServiceList().get(interfaceName+version);
         if (ips.size() <=0 ){
-            return "无服务提供";
+            result.setSuccess(false);
+            result.setMsg("无服务提供");
+            return result;
         }
         List<String> ipList = ips.stream().map(ipPojo -> ipPojo.getIp()+":"+ipPojo.getPort()).collect(Collectors.toList());
         Channel channel = ChannelPool.getChannelByContainKey(ipList);
@@ -63,7 +66,7 @@ public class NettyClient {
                 while (true){
                     RPCResponsePacketHandler responsePacketHandler = (RPCResponsePacketHandler)channel.pipeline().get(IpUtil.getIp()+"ResponseHandler");
                     if (responsePacketHandler.getResult() != null){
-                        result =  responsePacketHandler.getResult();
+                        result.setResult(responsePacketHandler.getResult());
                         return result;
                     }
                 }
@@ -76,6 +79,13 @@ public class NettyClient {
                 channel.close();
                 log.error("关闭缓存通道");
                 // 重新遍历其他ip，尝试继续创建新的Channel通信
+                ips = ZookeeperCache.getServiceList().get(interfaceName+version);
+                if (ips.size() <=0 ){
+                    result.setSuccess(false);
+                    result.setMsg("无服务提供");
+                    return result;
+                }
+                ipList = ips.stream().map(ipPojo -> ipPojo.getIp()+":"+ipPojo.getPort()).collect(Collectors.toList());
                 result = createNewChannel(packet,ipList);
                 return result;
             }
@@ -86,7 +96,8 @@ public class NettyClient {
         }
     }
 
-    private static Object createNewChannel(RPCRequestPacket packet, List<String> ipList){
+    private static Result createNewChannel(RPCRequestPacket packet, List<String> ipList){
+        Result result = new Result();
         log.info("创建新的Channel来通信");
         for (String ip : ipList) {
             // RPC调用
@@ -118,7 +129,7 @@ public class NettyClient {
                     while (true){
                         RPCResponsePacketHandler responsePacketHandler = (RPCResponsePacketHandler)future.channel().pipeline().get(IpUtil.getIp()+"ResponseHandler");
                         if (responsePacketHandler.getResult() != null){
-                            Object result =  responsePacketHandler.getResult();
+                            result.setResult(responsePacketHandler.getResult());
                             responsePacketHandler.setResult(null);
                             return result;
                         }
@@ -127,10 +138,13 @@ public class NettyClient {
                     continue;
                 }
             }catch (Exception e){
-                log.error("创建新Channel通信报错："+e.getMessage());
-                return "调用失败";
+                // 报异常还是继续遍历ip列表进行RPC通信
+                log.error("连接"+ip+"进行RPC通信失败");
+                continue;
             }
         }
-        return "调用失败";
+        result.setSuccess(false);
+        result.setMsg("调用失败");
+        return result;
     }
 }
